@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetPilot - Network Automation</title>
+  <style>
+    :root {
+      --navy: #10233f;
+      --navy-2: #173451;
+      --blue: #2878bd;
+      --blue-2: #3c91d2;
+      --sky: #edf5fa;
+      --green: #39a87d;
+      --orange: #ef9d52;
+      --red: #d96d72;
+      --text: #1d2a3a;
+      --muted: #7c8998;
+      --line: #dde5ed;
+      --surface: #ffffff;
+      --background: #f4f7fa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+    }
+
+    button, input, textarea, select { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 238px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .brand {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 26px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .brand-mark {
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #eaf4fb;
+      color: var(--navy);
+      box-shadow: inset 0 0 0 1px rgba(16,35,63,.08);
+    }
+
+    .brand-mark svg { width: 21px; height: 21px; }
+    .brand-name { font-size: 18px; font-weight: 750; letter-spacing: -.2px; }
+    .brand-name span { color: #77b1dd; }
+
+    .nav { padding: 22px 14px; }
+    .nav-label {
+      margin: 0 12px 10px;
+      color: #8298af;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      width: 100%;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 13px;
+      margin-bottom: 4px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #aebfd0;
+      cursor: pointer;
+      text-align: left;
+      transition: .18s ease;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .nav-item.active {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .nav-item svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .nav-item span { font-size: 13px; font-weight: 650; }
+    .nav-badge {
+      margin-left: auto;
+      min-width: 21px;
+      height: 21px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(255,255,255,.14);
+      font-size: 10px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 18px 14px 20px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .device-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #54c99a;
+      box-shadow: 0 0 0 4px rgba(84,201,154,.1);
+    }
+    .device-status strong { display: block; font-size: 11px; }
+    .device-status small { color: #8fa4ba; font-size: 10px; }
+
+    .main { min-width: 0; }
+
+    .topbar {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 38px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .page-title h1 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: -.35px;
+    }
+    .page-title p { margin: 0; color: var(--muted); font-size: 11px; }
+
+    .top-actions { display: flex; align-items: center; gap: 14px; }
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #607083;
+      cursor: pointer;
+    }
+    .icon-button svg { width: 17px; height: 17px; }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding-left: 2px;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #dfeaf3;
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .profile strong { display: block; font-size: 12px; }
+    .profile small { color: var(--muted); font-size: 10px; }
+
+    .content {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 28px 38px 40px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card {
+      min-height: 112px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 3px 12px rgba(30,54,78,.025);
+    }
+    .metric-icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--sky);
+      color: var(--blue);
+    }
+    .metric-icon.green { background: #edf7f3; color: var(--green); }
+    .metric-icon.orange { background: #fff5ed; color: var(--orange); }
+    .metric-icon svg { width: 22px; height: 22px; }
+    .metric-card small { color: var(--muted); font-size: 11px; }
+    .metric-value { display: flex; align-items: baseline; gap: 7px; margin-top: 5px; }
+    .metric-value strong { font-size: 25px; line-height: 1; }
+    .trend { color: var(--green); font-size: 10px; font-weight: 800; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(280px, .75fr);
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 3px 12px rgba(30,54,78,.025);
+    }
+
+    .panel-header {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-header h2 { margin: 0; font-size: 13px; letter-spacing: -.1px; }
+    .panel-header a { color: var(--blue); font-size: 10px; font-weight: 750; text-decoration: none; }
+
+    .connection-card { padding: 20px; }
+    .connection-row {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 64px;
+      border-bottom: 1px solid #edf1f5;
+    }
+    .connection-row:last-child { border-bottom: 0; }
+    .router-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #edf5fa;
+      color: var(--blue);
+    }
+    .router-icon svg { width: 21px; height: 21px; }
+    .router-info strong { display: block; font-size: 12px; margin-bottom: 4px; }
+    .router-info span { color: var(--muted); font-size: 10px; }
+    .health { text-align: right; }
+    .health strong { display: block; color: var(--green); font-size: 11px; }
+    .health span { color: var(--muted); font-size: 9px; }
+
+    .command-panel { grid-column: 1 / -1; }
+    .command-body { padding: 18px 20px 20px; }
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .command-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 72px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+    }
+    .command-card code {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      color: #35516b;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .command-card small { display: block; margin-bottom: 5px; color: var(--muted); font-size: 9px; }
+    .command-index {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .run-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+    }
+    .run-bar p { margin: 0; color: var(--muted); font-size: 10px; }
+    .run-button {
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 750;
+      cursor: pointer;
+      box-shadow: 0 7px 15px rgba(40,120,189,.18);
+      transition: .18s ease;
+    }
+    .run-button:hover { background: #226fae; transform: translateY(-1px); }
+    .run-button svg { width: 15px; height: 15px; }
+
+    .activity-list { padding: 8px 20px 12px; }
+    .activity-item {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 58px;
+      border-bottom: 1px solid #edf1f5;
+    }
+    .activity-item:last-child { border-bottom: 0; }
+    .activity-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .activity-dot.warning { background: var(--orange); }
+    .activity-text strong { display: block; font-size: 11px; margin-bottom: 4px; }
+    .activity-text span { color: var(--muted); font-size: 9px; }
+    .activity-time { color: var(--muted); font-size: 9px; }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 10;
+      min-width: 260px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      box-shadow: 0 14px 34px rgba(16,35,63,.24);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: #54c99a; }
+
+    .job-result {
+      grid-column: 1 / -1;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .job-result.error { border-color: #ecc1c3; }
+    .job-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 46px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fbfd;
+    }
+    .job-result-header strong { font-size: 11px; }
+    .job-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 750;
+    }
+    .job-status.failed { color: var(--red); }
+    .job-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .job-output { padding: 14px; }
+    .job-output details { border-bottom: 1px solid #edf1f5; }
+    .job-output details:last-child { border-bottom: 0; }
+    .job-output summary {
+      padding: 10px 0;
+      color: #35516b;
+      font-size: 11px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .job-output pre {
+      max-height: 260px;
+      overflow: auto;
+      margin: 0 0 12px;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--navy);
+      color: #dceaf4;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 10px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .error-message { padding: 14px; color: #a7464b; font-size: 11px; }
+    .run-button.loading { pointer-events: none; opacity: .72; }
+
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 78px minmax(0, 1fr); }
+      .brand { justify-content: center; padding: 0; }
+      .brand-name, .nav-label, .nav-item span, .nav-badge, .device-status div { display: none; }
+      .nav { padding: 22px 10px; }
+      .nav-item { justify-content: center; padding: 0; }
+      .sidebar-footer { padding: 18px 10px; }
+      .device-status { justify-content: center; padding: 12px 0; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .app { display: block; }
+      .sidebar {
+        position: fixed;
+        z-index: 20;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        flex-direction: row;
+      }
+      .brand, .nav-label, .sidebar-footer { display: none; }
+      .nav {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        padding: 8px;
+      }
+      .nav-item { height: 48px; margin: 0; }
+      .main { padding-bottom: 64px; }
+      .topbar { height: 68px; padding: 0 18px; }
+      .top-actions .icon-button { display: none; }
+      .profile div:last-child { display: none; }
+      .content { padding: 18px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .command-panel { grid-column: auto; }
+      .command-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .metrics { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .metric-card { min-height: 96px; padding: 12px; gap: 10px; }
+      .metric-icon { width: 38px; height: 38px; }
+      .metric-value strong { font-size: 20px; }
+      .trend { display: none; }
+      .run-bar { align-items: flex-end; gap: 10px; }
+      .run-bar p { max-width: 130px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8"></path>
+          </svg>
+        </div>
+        <div class="brand-name">Net<span>Pilot</span></div>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <p class="nav-label">Workspace</p>
+        <button class="nav-item active" type="button" data-view="Overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" type="button" data-view="Devices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8M12 17v4M7 9h10M7 13h6"></path></svg>
+          <span>Devices</span><span class="nav-badge">3</span>
+        </button>
+        <button class="nav-item" type="button" data-view="Automation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>
+          <span>Automation</span>
+        </button>
+        <button class="nav-item" type="button" data-view="Logs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6M8 13h8M8 17h6"></path></svg>
+          <span>Logs</span>
+        </button>
+        <button class="nav-item" type="button" data-view="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6v.2h-2.6V20a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1L7.6 17l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H6v-2.6h.4a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9L7.6 7l1.8-1.8.1.1a1.7 1.7 0 001.9.3 1.7 1.7 0 001-1.6v-.2H15V4a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 00-.3 1.9 1.7 1.7 0 001.6 1h.2V13H21a1.7 1.7 0 00-1.6 1z"></path></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="device-status">
+          <span class="status-dot"></span>
+          <div><strong>Controller Online</strong><small>Last sync 12 sec ago</small></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <h1 id="pageTitle">Network Overview</h1>
+          <p>Thursday, November 19, 2026</p>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" type="button" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"></path></svg>
+          </button>
+          <div class="profile">
+            <div class="avatar">AD</div>
+            <div><strong>Admin User</strong><small>Network Engineer</small></div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="metrics">
+          <article class="metric-card">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8M12 17v4M7 9h10M7 13h6"></path></svg>
+            </div>
+            <div><small>Total Devices</small><div class="metric-value"><strong>3</strong><span class="trend">+1 new</span></div></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"></path></svg>
+            </div>
+            <div><small>Online</small><div class="metric-value"><strong>3</strong><span class="trend">100%</span></div></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"></path><path d="M10.3 3.7L2.7 17a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.7a2 2 0 00-3.4 0z"></path></svg>
+            </div>
+            <div><small>Alerts</small><div class="metric-value"><strong>2</strong><span class="trend" style="color:var(--orange)">Review</span></div></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>
+            </div>
+            <div><small>Jobs Today</small><div class="metric-value"><strong>12</strong><span class="trend">+18%</span></div></div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-header"><h2>Device Connections</h2><a href="#">View all</a></div>
+            <div class="connection-card">
+              <div class="connection-row">
+                <div class="router-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="10" rx="2"></rect><path d="M7 11h10M7 14h4M17 14h.01"></path></svg></div>
+                <div class="router-info"><strong>Core-Router-01</strong><span>192.168.10.33 &nbsp; / &nbsp; Cisco IOS</span></div>
+                <div class="health"><strong>Healthy</strong><span>12 ms</span></div>
+              </div>
+              <div class="connection-row">
+                <div class="router-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="10" rx="2"></rect><path d="M7 11h10M7 14h4M17 14h.01"></path></svg></div>
+                <div class="router-info"><strong>Edge-Router-02</strong><span>192.168.10.34 &nbsp; / &nbsp; Cisco IOS</span></div>
+                <div class="health"><strong>Healthy</strong><span>18 ms</span></div>
+              </div>
+              <div class="connection-row">
+                <div class="router-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="10" rx="2"></rect><path d="M7 11h10M7 14h4M17 14h.01"></path></svg></div>
+                <div class="router-info"><strong>Lab-Switch-01</strong><span>192.168.10.35 &nbsp; / &nbsp; Cisco IOS XE</span></div>
+                <div class="health"><strong>Healthy</strong><span>24 ms</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header"><h2>Recent Activity</h2><a href="#">View logs</a></div>
+            <div class="activity-list">
+              <div class="activity-item"><span class="activity-dot"></span><div class="activity-text"><strong>Configuration backed up</strong><span>Core-Router-01</span></div><span class="activity-time">2m</span></div>
+              <div class="activity-item"><span class="activity-dot warning"></span><div class="activity-text"><strong>Interface status changed</strong><span>Edge-Router-02</span></div><span class="activity-time">18m</span></div>
+              <div class="activity-item"><span class="activity-dot"></span><div class="activity-text"><strong>Health check completed</strong><span>All devices</span></div><span class="activity-time">31m</span></div>
+            </div>
+          </section>
+
+          <section class="panel command-panel">
+            <div class="panel-header"><h2>Quick Automation</h2><a href="#">Manage commands</a></div>
+            <div class="command-body">
+              <div class="command-grid">
+                <div class="command-card"><div class="command-index">01</div><div><small>Running Configuration</small><code>show running-config</code></div></div>
+                <div class="command-card"><div class="command-index">02</div><div><small>Interface Summary</small><code>show ip interface brief</code></div></div>
+                <div class="command-card"><div class="command-index">03</div><div><small>System Information</small><code>show version</code></div></div>
+              </div>
+              <form class="run-bar" method="post" action="/">
+                <p>Run the selected command set on Core-Router-01</p>
+                <button class="run-button" type="submit" id="runButton">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"></path></svg>
+                  Run Diagnostics
+                </button>
+              </form>
+              {% if error or results %}
+              <section class="job-result{% if error %} error{% endif %}">
+                <div class="job-result-header">
+                  <strong>Latest Diagnostic Job</strong>
+                  {% if error %}
+                  <span class="job-status failed">Failed</span>
+                  {% else %}
+                  <span class="job-status">Completed</span>
+                  {% endif %}
+                </div>
+                {% if error %}
+                <div class="error-message">{{ error }}</div>
+                {% else %}
+                <div class="job-output">
+                  {% for command, output in results.items() %}
+                  <details{% if loop.first %} open{% endif %}>
+                    <summary>{{ command }}</summary>
+                    <pre>{{ output }}</pre>
+                  </details>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </section>
+              {% endif %}
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"><span class="toast-dot"></span><span>Diagnostics started successfully</span></div>
+
+  <script>
+    document.querySelectorAll('.nav-item').forEach(function (item) {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.nav-item').forEach(function (nav) {
+          nav.classList.remove('active');
+        });
+        item.classList.add('active');
+        document.getElementById('pageTitle').textContent =
+          item.dataset.view === 'Overview' ? 'Network Overview' : item.dataset.view;
+      });
+    });
+
+    document.getElementById('runButton').addEventListener('click', function () {
+      var toast = document.getElementById('toast');
+      this.classList.add('loading');
+      this.innerHTML = 'Connecting...';
+      toast.classList.add('show');
+      window.setTimeout(function () { toast.classList.remove('show'); }, 2800);
+    });
+  </script>
+</body>
+</html>
